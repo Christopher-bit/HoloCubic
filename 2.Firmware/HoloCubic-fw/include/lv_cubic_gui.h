@@ -16,7 +16,6 @@ extern "C" {
 
 	void lv_holo_cubic_gui(void);
 
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

@@ -1,0 +1,9 @@
+screen.init()在display.cpp中，Display::init()中的tft.setRotation(4)函数起到屏幕镜像的作用。
+lv_holo_cubic_gui()在lv_cubic_gui.cpp中，函数起到显示开机图像的作用。
+//platformIO:
+//真正的被使用的SPI驱动
+C:\Users\Christopher\.platformio\packages\framework-arduinoespressif32\libraries\SPI\src\SPI.cpp
+
+//真正的被使用的TFT_eSPI用户setup：
+D:\HoloCubic\2.Firmware\HoloCubic-fw\lib\TFT_eSPI\User_Setups\Setup24_ST7789.h
+144-292

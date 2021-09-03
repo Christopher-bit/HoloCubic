@@ -12,7 +12,7 @@ extern "C" {
 
 	extern lv_obj_t* scr_1;
 	extern lv_obj_t* scr_2;
-
+	extern lv_obj_t* scr_3;
 
 	void lv_holo_cubic_gui(void);
 

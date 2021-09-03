@@ -33,7 +33,9 @@ public:
 
 	void readBinFromSd(const char* path, uint8_t* buf);
 
-	void writeBinToSd(const char* path, uint8_t* buf);
+	void writeBinToSd(const char* path, uint8_t* buf, int len);
+
+	void appendBinToSd(const char* path, uint8_t* buf, int len);
 
 	void fileIO(  const char* path);
 

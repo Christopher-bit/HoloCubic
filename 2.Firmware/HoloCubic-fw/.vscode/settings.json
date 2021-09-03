@@ -1,0 +1,28 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp",
+        "initializer_list": "cpp",
+        "images.h": "c",
+        "lv_cubic_gui.h": "c",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "font16.c": "cpp",
+        "font64rle.c": "cpp",
+        "tft_espi_esp32.c": "cpp",
+        "glcdfont.c": "cpp",
+        "events_init.h": "c",
+        "lv_demo_widgets.h": "c",
+        "lv_examples.h": "c",
+        "iosfwd": "cpp",
+        "limits": "cpp",
+        "streambuf": "cpp"
+    }
+}

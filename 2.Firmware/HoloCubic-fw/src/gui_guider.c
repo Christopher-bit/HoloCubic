@@ -11,3 +11,4 @@ void setup_ui(lv_ui* ui)
 	setup_scr_scenes(ui);
 	lv_scr_load(ui->scenes);
 }
+

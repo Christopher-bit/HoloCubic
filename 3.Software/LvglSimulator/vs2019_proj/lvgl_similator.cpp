@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 
 	 //lv_demo_widgets();
 	 //lv_demo_benchmark();
-	 lv_demo_keypad_encoder();
+	 //lv_demo_keypad_encoder();
 	 //lv_demo_printer();
 	 //lv_demo_stress();
 	 //lv_ex_get_started_1();
@@ -91,11 +91,19 @@ int main(int argc, char** argv)
 	  //lv_ex_img_1();
 	  //lv_ex_tileview_1();
 
-	//lv_holo_cubic_gui();
+	lv_holo_cubic_gui();
 
-	//lv_scr_load_anim(scr_2, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 300, 5000, false);
+	/*lv_obj_t* scr_4 = lv_scr_act();
+	lv_obj_t* img3 = lv_img_create(scr_4, NULL);
+	lv_img_set_src(img3, "D://HoloCubic//3.Software//LvglSimulator//vs2019_proj//image//wsy.bin");
+	lv_obj_align(img3, NULL, LV_ALIGN_CENTER, 0, 0);*/
 
+	/*lv_obj_t* imgbtn = lv_imgbtn_create(lv_scr_act(), NULL);
+	lv_imgbtn_set_src(imgbtn, LV_BTN_STATE_PRESSED, "D://HoloCubic//3.Software//LvglSimulator//vs2019_proj//image//wsy.bin");
+	lv_obj_align(imgbtn, NULL, LV_ALIGN_CENTER, 0, 0);*/
 
+	lv_scr_load_anim(scr_2, LV_SCR_LOAD_ANIM_FADE_ON, 300, 1000, true);
+	//Sleep(500);
 	while (1)
 	{
 		/* Periodically call the lv_task handler.

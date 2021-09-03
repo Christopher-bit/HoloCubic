@@ -57,7 +57,7 @@ void SdCard::listDir(const char* dirname, uint8_t levels)
 		Serial.println("Not a directory");
 		return;
 	}
-
+	
 	File file = root.openNextFile();
 	while (file)
 	{
@@ -121,7 +121,8 @@ void SdCard::readFile(const char* path)
 	Serial.print("Read from file: ");
 	while (file.available())
 	{
-		Serial.write(file.read());
+		// Serial.write(file.read());
+		Serial.print(file.read());
 	}
 	file.close();
 }
@@ -257,7 +258,7 @@ void SdCard::readBinFromSd(const char* path, uint8_t* buf)
 	}
 }
 
-void SdCard::writeBinToSd(const char* path, uint8_t* buf)
+void SdCard::writeBinToSd(const char* path, uint8_t* buf, int len)
 {
 	File file = SD.open(path, FILE_WRITE);
 	if (!file)
@@ -265,15 +266,49 @@ void SdCard::writeBinToSd(const char* path, uint8_t* buf)
 		Serial.println("Failed to open file for writing");
 		return;
 	}
-
-	size_t i;
-	for (i = 0; i < 2048; i++)
+	int offset=len%512;
+	len/=512;
+	Serial.print(offset);
+	Serial.print('\t');
+	uint8_t* p=buf;
+	for (int i = 0; i < len; i++)
 	{
-		file.write(buf, 512);
+		file.write(p, 512);
+		p+=512;
+	}
+	if(offset)
+	{
+		file.write(p, offset);
 	}
 	file.close();
+	// Serial.println("bin file been written");
 }
 
+void SdCard::appendBinToSd(const char* path, uint8_t* buf, int len)
+{
+	File file = SD.open(path, FILE_APPEND);
+	if (!file)
+	{
+		Serial.println("Failed to open file for appending");
+		return;
+	}
+	int offset=len%512;
+	len/=512;
+	Serial.print(offset);
+	Serial.print('\t');
+	uint8_t* p=buf;
+	for (int i = 0; i < len; i++)
+	{
+		file.write(p, 512);
+		p+=512;
+	}
+	if(offset)
+	{
+		file.write(p, offset);
+	}
+	file.close();
+	// Serial.println("bin file been append");
+}
 
 void SdCard::fileIO(const char* path)
 {
