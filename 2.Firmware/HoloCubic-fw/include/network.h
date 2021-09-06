@@ -24,8 +24,9 @@ class WifiLib{
 		"Christopher",
 		"FAST_322E",
 		"TP-LINK_EA16",
-		"@PHICOMM_C8_5G",
-		"玩游戏的小破为"
+		"玩游戏的小破为",
+		"@PHICOMM_C8"
+		
 		// "nuaa.wifi6",
 		// "nuaa.portal"
 	};
@@ -33,8 +34,9 @@ class WifiLib{
 		"wsywsywsy",
 		"20000606",
 		"20000606",
-		"mima69521530",
-		"wyx03060106"
+		"wyx03060106",
+		"mima69521530"
+		
 	};
 };
 

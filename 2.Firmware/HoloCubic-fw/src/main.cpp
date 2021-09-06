@@ -81,10 +81,12 @@ int svrtransflg=0;//传输完成标志位
 uint8_t wifi_ok=0;//wifi连接成功标志位
 uint8_t filemngflg=0;//文件管理标志位
 uint8_t imgtransflg=0;//图片传输标志位
+uint8_t loopnum=0;//循环计数器
 
 /*0为纪念日，1为天气，2为相册*/
 uint8_t ScrnFlg=0;//屏幕功能标志位
 int FcnShftTim=0;//功能切换用时
+
 
 void IRAM_ATTR onTimer();
 void WebLed(String webcmd);
@@ -105,8 +107,8 @@ void setup()
     /*** Init on-board RGB ***/
     // rgb.init();
     // rgb.setBrightness(0.1).setRGB(0, 0, 122, 204).setRGB(1, 0, 122, 204);
-    FastLED.addLeds<WS2812B, RGB_LED_PIN, GRB>(leds, 1);
-    leds[0] = CRGB::Black;
+    // FastLED.addLeds<WS2812B, RGB_LED_PIN, GRB>(leds, 1);
+    // leds[0] = CRGB::Black;
 
     /*  1/(80MHZ/80) = 1us  */
     timer = timerBegin(1, 120, true);
@@ -297,7 +299,7 @@ void loop()
                 else if(PacSeq>1)
                 {
                     tf.appendBinToSd(filename,packetBuffer+6,PacLen);
-                    WebLed("BLN green");
+                    // WebLed("BLN green");
                 }
                 Serial.print(PacSum);Serial.print('\t');
                 Serial.print(PacSeq);Serial.print('\t');
@@ -318,7 +320,7 @@ void loop()
                     tf.deleteFile("/filename.txt");
                     tf.writeFile("/filename.txt",abspath);
                     tf.appendFile("/filename.txt","\n");
-                    WebLed("open led");
+                    // WebLed("open led");
                     break;
                 }
             }
@@ -341,89 +343,90 @@ void loop()
 
     if(ScrnFlg==0)//纪念日模式
     {
-        WebLed("BLN green");
-        XiangceFlg=0;//相册标志位置零
-        NJFlg=0;//天气标志位置零
-        ZZFlg=0;//天气标志位置零
-        rootflg=0;//根目录标志位置零
-        filemngflg=0;//文件管理标志位置零
-        imgtransflg=0;//图片传输标志位置零
-        if(JinianFlg==0)
-        {
-            String shiftfilename=tf.readFileLine("/filename.txt",1);
-            Serial.println(shiftfilename);
-            if(svrtransflg==1)//接收到新图片
+            
+            XiangceFlg=0;//相册标志位置零
+            NJFlg=0;//天气标志位置零
+            ZZFlg=0;//天气标志位置零
+            rootflg=0;//根目录标志位置零
+            filemngflg=0;//文件管理标志位置零
+            imgtransflg=0;//图片传输标志位置零
+            if(JinianFlg==0)
             {
-                lv_img_set_src(img,shiftfilename.c_str());
-                lv_obj_align(img, NULL, LV_ALIGN_CENTER, 0, 0);
-                screen.routine();
-                svrtransflg=0;
-                JinianFlg=1;
-            }
-            else
-            {
-                lv_img_set_src(img, shiftfilename.c_str());
-                lv_obj_align(img, NULL, LV_ALIGN_CENTER, 0, 0);
-                screen.routine();
-                JinianFlg=1;
-            }
-        }
-        /**********************
-         * get ntp time, date
-         **********************/
-        if(TimSpdTgtr<2&&WiFi.getMode()==WIFI_STA&&WiFi.isConnected()==1)
-        {
-            NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 0, 30 * 60 * 1000);
-            timeClient.begin();
-            if(timeClient.update())
-            {
-                String time_str = timeClient.getFormattedTime();
-                int day=timeClient.getDay();
-                unsigned long epochTime=timeClient.getEpochTime();
-                struct tm *ptm = gmtime ((time_t *)&epochTime);
-                int monthDay = ptm->tm_mday;
-                int currentMonth = ptm->tm_mon+1;
-                int currentYear = ptm->tm_year+1900;
-                unsigned long SecondSpentTogether=epochTime-1614960000;//1614960000是2020.03.06 00：00的时间戳
-                unsigned long DaySpentTogether=SecondSpentTogether/86400;
-                //Print complete date:
-                String currentDate = String(currentYear) + "-" + String(currentMonth) + "-" + String(monthDay)+ "\t" + "XingQi " + String(day);
-                tft.drawNumber(DaySpentTogether,28,185,LOAD_FONT6);//print commemoration day
-                extern int8_t wifi_num;
-                if(wifi_num==4)
+                String shiftfilename=tf.readFileLine("/filename.txt",1);
+                Serial.println(shiftfilename);
+                if(svrtransflg==1)//接收到新图片
                 {
-                    tft.drawString("wyx's hotspot",80,20,LOAD_FONT2);
+                    lv_img_set_src(img,shiftfilename.c_str());
+                    lv_obj_align(img, NULL, LV_ALIGN_CENTER, 0, 0);
+                    screen.routine();
+                    svrtransflg=0;
+                    JinianFlg=1;
                 }
                 else
-                tft.drawString(wifilib.ssid[wifi_num],80,20,LOAD_FONT2);
-                String daystr=tf.readFileLine("/day.txt",1);
-                Serial.println("day:"+daystr);
-                int daynum=0;
-                sscanf(daystr.c_str(),"%d",&daynum);
-                if((DaySpentTogether-daynum)>1)
                 {
-                    tf.deleteFile("/filename.txt");
-                    tf.writeFile("/filename.txt","S:/jinian(4).bin\n");
+                    lv_img_set_src(img, shiftfilename.c_str());
+                    lv_obj_align(img, NULL, LV_ALIGN_CENTER, 0, 0);
+                    screen.routine();
+                    JinianFlg=1;
                 }
-                tf.deleteFile("/day.txt");
-                tf.writeFile("/day.txt",String(DaySpentTogether).c_str());
-                tf.appendFile("/day.txt","\n");
-                // int nowhour=((epochTime%86400)/3600+8)%24;//当前小时
-                // int nowmin=((epochTime%86400)%3600)/60;//当前分钟
-                // Serial.print(String(nowhour)+":"+String(nowmin)+"\n");
-                TimSpdTgtr++;
             }
-        }
-        else 
-        {
-            TimSpdTgtr=3;
-        }
+            /**********************
+             * get ntp time, date
+             **********************/
+            if(TimSpdTgtr<2&&WiFi.getMode()==WIFI_STA&&WiFi.isConnected()==1)
+            {
+                NTPClient timeClient(ntpUDP, "ntp1.aliyun.com", 60 * 60 * 0, 30 * 60 * 1000);
+                timeClient.begin();
+                if(timeClient.update())
+                {
+                    String time_str = timeClient.getFormattedTime();
+                    int day=timeClient.getDay();
+                    unsigned long epochTime=timeClient.getEpochTime();
+                    struct tm *ptm = gmtime ((time_t *)&epochTime);
+                    int monthDay = ptm->tm_mday;
+                    int currentMonth = ptm->tm_mon+1;
+                    int currentYear = ptm->tm_year+1900;
+                    unsigned long SecondSpentTogether=epochTime-1614960000;//1614960000是2020.03.06 00：00的时间戳
+                    unsigned long DaySpentTogether=SecondSpentTogether/86400;
+                    //Print complete date:
+                    String currentDate = String(currentYear) + "-" + String(currentMonth) + "-" + String(monthDay)+ "\t" + "XingQi " + String(day);
+                    tft.drawNumber(DaySpentTogether,28,185,LOAD_FONT6);//print commemoration day
+                    extern int8_t wifi_num;
+                    if(wifi_num==3)
+                    {
+                        tft.drawString("wyx's hotspot",80,20,LOAD_FONT2);
+                    }
+                    else
+                    tft.drawString(wifilib.ssid[wifi_num],80,20,LOAD_FONT2);
+                    String daystr=tf.readFileLine("/day.txt",1);
+                    Serial.println("day:"+daystr);
+                    int daynum=0;
+                    sscanf(daystr.c_str(),"%d",&daynum);
+                    if((DaySpentTogether-daynum)>1)
+                    {
+                        tf.deleteFile("/filename.txt");
+                        tf.writeFile("/filename.txt","S:/jinian(4).bin\n");
+                    }
+                    tf.deleteFile("/day.txt");
+                    tf.writeFile("/day.txt",String(DaySpentTogether).c_str());
+                    tf.appendFile("/day.txt","\n");
+                    // int nowhour=((epochTime%86400)/3600+8)%24;//当前小时
+                    // int nowmin=((epochTime%86400)%3600)/60;//当前分钟
+                    // Serial.print(String(nowhour)+":"+String(nowmin)+"\n");
+                    TimSpdTgtr++;
+                }
+            }
+            else 
+            {
+                TimSpdTgtr=3;
+            }
     }
 
 
     else if(ScrnFlg==1)//相册模式
     {
-        WebLed("BLN blue");
+        
+        // WebLed("BLN blue");
         JinianFlg=0;//纪念日标志位置零
         TimSpdTgtr=0;//时间戳获取标志位置零
         NJFlg=0;//天气标志位置零
@@ -458,7 +461,7 @@ void loop()
 
     else if(ScrnFlg==2)//天气预报模式，南京
     {
-        WebLed("BLN gold");
+        
         XiangceFlg=0;//相册标志位置零
         JinianFlg=0;//纪念标志位置零
         TimSpdTgtr=0;//时间戳获取标志位置零
@@ -532,7 +535,7 @@ void loop()
 
     else if(ScrnFlg==3)//天气预报模式，郑州
     {
-        WebLed("BLN purple");
+        // WebLed("BLN purple");
         XiangceFlg=0;//相册标志位置零
         JinianFlg=0;//纪念标志位置零
         TimSpdTgtr=0;//时间戳获取标志位置零
@@ -617,7 +620,7 @@ void loop()
             tft.drawString("file management",20,0,LOAD_FONT4);
             filemngflg=1;//文件管理标志位置一
         }
-        WebLed("BLN salmon");
+        // WebLed("BLN salmon");
         char buf[30];
         for(int i=0;i<30;i++)
         {
@@ -696,7 +699,7 @@ void loop()
             else if(PacSeq>1)
             {
                 tf.appendBinToSd(filename,packetBuffer+6,PacLen);
-                WebLed("BLN green");
+                // WebLed("BLN green");
                 LedProc(ledsta);
             }
             Serial.print(PacSum);Serial.print('\t');
@@ -712,7 +715,7 @@ void loop()
                 imgsum[6]=imgnum/100+0x30;
                 imgsum[7]=(imgnum/10)%10+0x30;
                 imgsum[8]=imgnum%10+0x30;
-                WebLed("open led");
+                // WebLed("open led");
                 lv_img_set_src(img, abspath);
                 lv_obj_align(img, NULL, LV_ALIGN_CENTER, 0, 0);
                 screen.routine();
@@ -723,7 +726,7 @@ void loop()
     /**********************
      * led process
      **********************/
-    LedProc(ledsta);
+    // LedProc(ledsta);
 
 
 
@@ -966,7 +969,7 @@ void IRAM_ATTR onTimer()
     if(DlyFlag==0)
     {
         DlyTim++;
-        if(DlyTim==64)
+        if(DlyTim==40)
         {
         DlyFlag=1;
         }
